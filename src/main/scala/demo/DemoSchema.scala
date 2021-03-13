@@ -1,23 +1,25 @@
 package demo
 
 import demo.CommonResolver.{DeferredBooking, DeferredInsurance}
-import demo.Models.{Booking, Insurance, Itinerary}
+import demo.Models.{Booking, InputItinerary, Insurance, Itinerary}
 import sangria.execution.deferred.{DeferredResolver, Fetcher, HasId, Relation, RelationIds}
 import sangria.schema._
 import sangria.macros.derive._
-
+import sangria.marshalling.circe._
+import io.circe.generic.auto._
 
 object DemoSchema {
-  lazy val schema = Schema(ObjectType("Query", fields[GraphQLCtx, Unit](
+  lazy val schema = Schema(QueryType, Some(MutationType))
+
+  // TYPES
+  implicit lazy val QueryType = ObjectType("Query", fields[GraphQLCtx, Unit](
     Field(
       name = "itineraries",
       fieldType = ListType(ItineraryType),
       arguments = ItineraryIdsArg :: Nil,
       resolve = ctx => ctx.ctx.getItineraries(ctx.arg(ItineraryIdsArg))
     )
-  )))
-
-  // TYPES
+  ))
   implicit lazy val BookingType = deriveObjectType[GraphQLCtx, Booking]()
   implicit lazy val InsuranceType = deriveObjectType[GraphQLCtx, Insurance]()
   implicit lazy val ItineraryType = deriveObjectType[GraphQLCtx, Itinerary](
@@ -34,9 +36,19 @@ object DemoSchema {
       )
     )
   )
+  implicit lazy val MutationType = ObjectType("Mutation", fields[GraphQLCtx, Unit](
+    Field(
+      name = "createItinerary",
+      fieldType = ItineraryType,
+      arguments = ItineraryInputArg :: Nil,
+      resolve = ctx => ctx.ctx.createItinerary(ctx.arg(ItineraryInputArg))
+    )
+  ))
+  implicit lazy val InputItineraryType = deriveInputObjectType[InputItinerary]()
 
   // ARGS
   lazy val ItineraryIdsArg = Argument("itineraryIds", ListInputType(IntType))
+  lazy val ItineraryInputArg = Argument("inputItinerary", InputItineraryType)
 
   // FETCHERS
   lazy val BookingFetcher = Fetcher.rel(
