@@ -30,6 +30,7 @@ object Routes {
   def executeGraphql(query: GraphQLQuery): Future[(StatusCode, Json)] = Executor
     .execute(
       schema = DemoSchema.schema,
+      userContext = new GraphQLCtx,
       queryAst = query.document,
       operationName = query.operationName,
       variables = query.variables
