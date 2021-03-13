@@ -2,6 +2,7 @@ package demo
 
 import demo.Models.{Booking, Itinerary}
 import sangria.schema._
+import sangria.macros.derive._
 
 object DemoSchema {
   lazy val schema = Schema(ObjectType("Query", fields[GraphQLCtx, Unit](
@@ -14,26 +15,8 @@ object DemoSchema {
   )))
 
   // TYPES
-  lazy val ItineraryType = ObjectType("itinerary", fields[GraphQLCtx, Itinerary](
-    Field(
-      name = "id",
-      fieldType = IntType,
-      resolve = ctx => ctx.value.id
-    ),
-    Field(
-      name = "booking",
-      fieldType = BookingType,
-      resolve = ctx => ctx.value.booking
-    )
-  ))
-
-  lazy val BookingType = ObjectType("booking", fields[GraphQLCtx, Booking](
-    Field(
-      name = "id",
-      fieldType = IntType,
-      resolve = ctx => ctx.value.id
-    )
-  ))
+  implicit lazy val BookingType = deriveObjectType[GraphQLCtx, Booking]()
+  implicit lazy val ItineraryType = deriveObjectType[GraphQLCtx, Itinerary]()
 
   // ARGS
   lazy val ItineraryIdsArg = Argument("itineraryIds", ListInputType(IntType))
