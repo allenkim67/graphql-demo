@@ -6,23 +6,26 @@ import scala.concurrent.Future
 
 object Models {
   case class GraphQLQuery(document: Document, operationName: Option[String], variables: Json)
-  case class Itinerary(id: Int, bookingId: Int)
-  case class Booking(id: Int)
+  case class Itinerary(id: Int)
+  case class Booking(id: Int, itineraryId: Int)
 }
 
 object MockDB {
   import Models._
 
   val itineraries = Seq(
-    Itinerary(1, bookingId = 11),
-    Itinerary(2, bookingId = 12),
-    Itinerary(3, bookingId = 13)
+    Itinerary(1),
+    Itinerary(2),
+    Itinerary(3)
   )
 
   val bookings = Seq(
-    Booking(11),
-    Booking(12),
-    Booking(13),
+    Booking(11, itineraryId = 1),
+    Booking(12, itineraryId = 1),
+    Booking(13, itineraryId = 2),
+    Booking(14, itineraryId = 2),
+    Booking(15, itineraryId = 3),
+    Booking(16, itineraryId = 3)
   )
 }
 
@@ -43,6 +46,12 @@ class GraphQLCtx {
   def getBookings(bookingIds: Seq[Int]): Future[Seq[Booking]] = {
     println("fetching bookings")
     val result = bookings.filter(booking => bookingIds.contains(booking.id))
+    Future.successful(result)
+  }
+
+  def getBookingsByItineraryIds(itineraryIds: Seq[Int]): Future[Seq[Booking]] = {
+    println("fetching bookings by itineraryIds")
+    val result = bookings.filter(booking => itineraryIds.contains(booking.itineraryId))
     Future.successful(result)
   }
 }

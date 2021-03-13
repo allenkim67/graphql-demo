@@ -1,7 +1,7 @@
 package demo
 
 import demo.Models.{Booking, Itinerary}
-import sangria.execution.deferred.{DeferredResolver, Fetcher, HasId}
+import sangria.execution.deferred.{DeferredResolver, Fetcher, HasId, Relation, RelationIds}
 import sangria.schema._
 import sangria.macros.derive._
 
@@ -19,12 +19,11 @@ object DemoSchema {
   // TYPES
   implicit lazy val BookingType = deriveObjectType[GraphQLCtx, Booking]()
   implicit lazy val ItineraryType = deriveObjectType[GraphQLCtx, Itinerary](
-    ExcludeFields("bookingId"),
     AddFields(
       Field(
         name = "booking",
-        fieldType = OptionType(BookingType),
-        resolve = ctx => BookingFetcher.deferOpt(ctx.value.bookingId)
+        fieldType = ListType(BookingType),
+        resolve = ctx => BookingFetcher.deferRelSeq(BookingsByItineraryId, ctx.value.id)
       )
     )
   )
@@ -33,9 +32,14 @@ object DemoSchema {
   lazy val ItineraryIdsArg = Argument("itineraryIds", ListInputType(IntType))
 
   // FETCHERS
-  val BookingFetcher = Fetcher(
-    (ctx: GraphQLCtx, ids: Seq[Int]) => ctx.getBookings(ids)
+  lazy val BookingFetcher = Fetcher.rel(
+    (ctx: GraphQLCtx, ids: Seq[Int]) => ctx.getBookings(ids),
+    (ctx: GraphQLCtx, idsGetter: RelationIds[Booking]) => ctx.getBookingsByItineraryIds(idsGetter(BookingsByItineraryId))
   )(HasId(_.id))
 
-  val deferredResolver = DeferredResolver.fetchers(BookingFetcher)
+  lazy val deferredResolver = DeferredResolver.fetchers(BookingFetcher)
+
+  // RELATIONS
+  lazy val BookingsByItineraryId =
+    Relation[Booking, Int]("bookingsByItineraryId", booking => Seq(booking.itineraryId))
 }
