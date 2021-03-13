@@ -31,7 +31,7 @@ object Routes {
     .execute(
       schema = DemoSchema.schema,
       userContext = new GraphQLCtx,
-      deferredResolver = DemoSchema.deferredResolver,
+      deferredResolver = new CommonResolver.CommonResolver,
       queryAst = query.document,
       operationName = query.operationName,
       variables = query.variables

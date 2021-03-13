@@ -1,5 +1,6 @@
 package demo
 
+import demo.CommonResolver.DeferredBooking
 import demo.Models.{Booking, Itinerary}
 import sangria.execution.deferred.{DeferredResolver, Fetcher, HasId, Relation, RelationIds}
 import sangria.schema._
@@ -23,7 +24,7 @@ object DemoSchema {
       Field(
         name = "booking",
         fieldType = ListType(BookingType),
-        resolve = ctx => BookingFetcher.deferRelSeq(BookingsByItineraryId, ctx.value.id)
+        resolve = ctx => DeferredBooking(ctx.value.id)
       )
     )
   )
