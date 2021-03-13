@@ -5,16 +5,17 @@ import sangria.ast.Document
 
 object Models {
   case class GraphQLQuery(document: Document, operationName: Option[String], variables: Json)
-  case class Itinerary(id: Int)
+  case class Itinerary(id: Int, booking: Booking)
+  case class Booking(id: Int)
 }
 
 object MockDB {
   import Models._
 
   val itineraries = Seq(
-    Itinerary(1),
-    Itinerary(2),
-    Itinerary(3)
+    Itinerary(1, booking = Booking(11)),
+    Itinerary(2, booking = Booking(12)),
+    Itinerary(3, booking = Booking(13))
   )
 }
 

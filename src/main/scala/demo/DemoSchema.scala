@@ -1,6 +1,6 @@
 package demo
 
-import demo.Models.Itinerary
+import demo.Models.{Booking, Itinerary}
 import sangria.schema._
 
 object DemoSchema {
@@ -14,7 +14,20 @@ object DemoSchema {
   )))
 
   // TYPES
-  val ItineraryType = ObjectType("itinerary", fields[GraphQLCtx, Itinerary](
+  lazy val ItineraryType = ObjectType("itinerary", fields[GraphQLCtx, Itinerary](
+    Field(
+      name = "id",
+      fieldType = IntType,
+      resolve = ctx => ctx.value.id
+    ),
+    Field(
+      name = "booking",
+      fieldType = BookingType,
+      resolve = ctx => ctx.value.booking
+    )
+  ))
+
+  lazy val BookingType = ObjectType("booking", fields[GraphQLCtx, Booking](
     Field(
       name = "id",
       fieldType = IntType,
@@ -23,5 +36,5 @@ object DemoSchema {
   ))
 
   // ARGS
-  val ItineraryIdsArg = Argument("itineraryIds", ListInputType(IntType))
+  lazy val ItineraryIdsArg = Argument("itineraryIds", ListInputType(IntType))
 }

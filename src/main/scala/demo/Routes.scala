@@ -21,7 +21,7 @@ object Routes {
     post {
       entity(as[GraphQLQuery]) { query =>
         complete {
-          executeGraphql(query)
+          try { executeGraphql(query) } catch { case e => println(e.getMessage); e.getMessage }
         }
       }
     }
