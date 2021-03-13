@@ -2,6 +2,7 @@ package demo
 
 import io.circe.Json
 import sangria.ast.Document
+import scala.concurrent.Future
 
 object Models {
   case class GraphQLQuery(document: Document, operationName: Option[String], variables: Json)
@@ -37,5 +38,11 @@ class GraphQLCtx {
   def getBooking(bookingId: Int): Option[Booking] = {
     println("fetching booking")
     bookings.find(booking => booking.id == bookingId)
+  }
+
+  def getBookings(bookingIds: Seq[Int]): Future[Seq[Booking]] = {
+    println("fetching bookings")
+    val result = bookings.filter(booking => bookingIds.contains(booking.id))
+    Future.successful(result)
   }
 }
