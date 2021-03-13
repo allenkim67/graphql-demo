@@ -1,7 +1,7 @@
 package demo
 
-import demo.CommonResolver.DeferredBooking
-import demo.Models.{Booking, Itinerary}
+import demo.CommonResolver.{DeferredBooking, DeferredInsurance}
+import demo.Models.{Booking, Insurance, Itinerary}
 import sangria.execution.deferred.{DeferredResolver, Fetcher, HasId, Relation, RelationIds}
 import sangria.schema._
 import sangria.macros.derive._
@@ -19,12 +19,18 @@ object DemoSchema {
 
   // TYPES
   implicit lazy val BookingType = deriveObjectType[GraphQLCtx, Booking]()
+  implicit lazy val InsuranceType = deriveObjectType[GraphQLCtx, Insurance]()
   implicit lazy val ItineraryType = deriveObjectType[GraphQLCtx, Itinerary](
     AddFields(
       Field(
         name = "booking",
         fieldType = ListType(BookingType),
         resolve = ctx => DeferredBooking(ctx.value.id)
+      ),
+      Field(
+        name = "insurance",
+        fieldType = ListType(InsuranceType),
+        resolve = ctx => DeferredInsurance(ctx.value.id)
       )
     )
   )

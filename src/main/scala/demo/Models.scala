@@ -8,6 +8,7 @@ object Models {
   case class GraphQLQuery(document: Document, operationName: Option[String], variables: Json)
   case class Itinerary(id: Int)
   case class Booking(id: Int, itineraryId: Int)
+  case class Insurance(id: Int, bookingId: Int)
 }
 
 object MockDB {
@@ -26,6 +27,15 @@ object MockDB {
     Booking(14, itineraryId = 2),
     Booking(15, itineraryId = 3),
     Booking(16, itineraryId = 3)
+  )
+
+  val insurances = Seq(
+    Insurance(101, bookingId = 11),
+    Insurance(102, bookingId = 12),
+    Insurance(103, bookingId = 13),
+    Insurance(104, bookingId = 14),
+    Insurance(105, bookingId = 15),
+    Insurance(106, bookingId = 16),
   )
 }
 
@@ -52,6 +62,12 @@ class GraphQLCtx {
   def getBookingsByItineraryIds(itineraryIds: Seq[Int]): Future[Seq[Booking]] = {
     println("fetching bookings by itineraryIds")
     val result = bookings.filter(booking => itineraryIds.contains(booking.itineraryId))
+    Future.successful(result)
+  }
+
+  def getInsuranceByBookingIds(bookingIds: Seq[Int]): Future[Seq[Insurance]] = {
+    println("fetching insurance")
+    val result = insurances.filter(insurance => bookingIds.contains(insurance.bookingId))
     Future.successful(result)
   }
 }
