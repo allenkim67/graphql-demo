@@ -16,7 +16,16 @@ object DemoSchema {
 
   // TYPES
   implicit lazy val BookingType = deriveObjectType[GraphQLCtx, Booking]()
-  implicit lazy val ItineraryType = deriveObjectType[GraphQLCtx, Itinerary]()
+  implicit lazy val ItineraryType = deriveObjectType[GraphQLCtx, Itinerary](
+    ExcludeFields("bookingId"),
+    AddFields(
+      Field(
+        name = "booking",
+        fieldType = OptionType(BookingType),
+        resolve = ctx => ctx.ctx.getBooking(ctx.value.bookingId)
+      )
+    )
+  )
 
   // ARGS
   lazy val ItineraryIdsArg = Argument("itineraryIds", ListInputType(IntType))
